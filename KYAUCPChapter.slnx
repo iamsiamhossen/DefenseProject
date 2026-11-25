@@ -1,7 +1,11 @@
 <Solution>
-  <Folder Name="/src/">
-    <Project Path="src/KYAUCPChapter.API/KYAUCPChapter.API.csproj" />
-    <Project Path="src/KYAUCPChapter.Core/KYAUCPChapter.Core.csproj" />
-    <Project Path="src/KYAUCPChapter.Infrastructure/KYAUCPChapter.Infrastructure.csproj" />
+  <Folder Name="/src/" />
+  <Folder Name="/src/backend/">
+    <Project Path="src/backend/KYAUCPChapter.API/KYAUCPChapter.API.csproj" />
+    <Project Path="src/backend/KYAUCPChapter.Core/KYAUCPChapter.Core.csproj" />
+    <Project Path="src/backend/KYAUCPChapter.Infrastructure/KYAUCPChapter.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/KYAUCPChapter.Core.Tests/KYAUCPChapter.Core.Tests.csproj" />
   </Folder>
 </Solution>
