@@ -1,0 +1,65 @@
+# Local Claude configuration and instructions
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+DESIGN.md
+skills-lock.json
+README-SETUP.md
+Install-KYAUClaudeConfig.ps1
+
+# Internal planning documents
+PROJECT-DECISIONS.md
+docs/PROJECT-DECISIONS.md
+docs/KYAU_CP_Chapter_SDD_v1.4.docx
+docs/superpowers/
+docs/plans/
+docs/specs/
+
+# Playwright artifacts
+.playwright/
+.playwright-cli/
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# .NET build outputs
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+TestResults/
+*.user
+*.suo
+.vs/
+*.trx
+coverage/
+*.coverage
+*.coveragexml
+
+# Node dependencies and build outputs
+node_modules/
+dist/
+dist-ssr/
+*.tsbuildinfo
+.vite/
+npm-debug.log*
+
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+*.pfx
+appsettings.*.local.json
+appsettings.Development.local.json
+
+# Logs and OS/editor files
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json

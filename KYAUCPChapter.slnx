@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/KYAUCPChapter.API/KYAUCPChapter.API.csproj" />
+    <Project Path="src/KYAUCPChapter.Core/KYAUCPChapter.Core.csproj" />
+    <Project Path="src/KYAUCPChapter.Infrastructure/KYAUCPChapter.Infrastructure.csproj" />
+  </Folder>
+</Solution>
