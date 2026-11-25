@@ -6,6 +6,7 @@
     <Project Path="src/backend/KYAUCPChapter.Infrastructure/KYAUCPChapter.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/KYAUCPChapter.API.Tests/KYAUCPChapter.API.Tests.csproj" />
     <Project Path="tests/KYAUCPChapter.Core.Tests/KYAUCPChapter.Core.Tests.csproj" />
     <Project Path="tests/KYAUCPChapter.Infrastructure.Tests/KYAUCPChapter.Infrastructure.Tests.csproj" />
   </Folder>

@@ -470,6 +470,22 @@ namespace KYAUCPChapter.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("0198b6a0-0000-7000-8000-000000000001"),
+                            ConcurrencyStamp = "0198b6a0-0000-7000-8000-000000000001",
+                            Name = "Student",
+                            NormalizedName = "STUDENT"
+                        },
+                        new
+                        {
+                            Id = new Guid("0198b6a0-0000-7000-8000-000000000002"),
+                            ConcurrencyStamp = "0198b6a0-0000-7000-8000-000000000002",
+                            Name = "Organizer",
+                            NormalizedName = "ORGANIZER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

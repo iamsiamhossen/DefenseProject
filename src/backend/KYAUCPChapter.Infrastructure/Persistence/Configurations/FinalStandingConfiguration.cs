@@ -1,3 +1,4 @@
+using KYAUCPChapter.Core.Common;
 using KYAUCPChapter.Core.Domain.Registrations;
 using KYAUCPChapter.Core.Domain.Scoring;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ internal sealed class FinalStandingConfiguration : IEntityTypeConfiguration<Fina
         });
 
         builder.HasKey(s => s.RegistrationId);
-        builder.Property(s => s.DisplayName).HasMaxLength(256);
+        builder.Property(s => s.DisplayName).HasMaxLength(FieldLengths.DisplayName);
         builder.HasOne<ContestRegistration>().WithOne().HasForeignKey<FinalStanding>(s => s.RegistrationId).OnDelete(DeleteBehavior.Restrict);
     }
 }

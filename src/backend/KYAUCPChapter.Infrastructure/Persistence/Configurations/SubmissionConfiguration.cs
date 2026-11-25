@@ -1,3 +1,4 @@
+using KYAUCPChapter.Core.Common;
 using KYAUCPChapter.Core.Domain.Contests;
 using KYAUCPChapter.Core.Domain.Registrations;
 using KYAUCPChapter.Core.Domain.Submissions;
@@ -14,11 +15,11 @@ internal sealed class SubmissionConfiguration : IEntityTypeConfiguration<Submiss
         builder.ToTable("Submissions");
         builder.HasKey(s => s.Id);
         builder.Property(s => s.Id).ValueGeneratedNever();
-        builder.Property(s => s.Language).HasMaxLength(50);
+        builder.Property(s => s.Language).HasMaxLength(FieldLengths.Language);
         builder.Property(s => s.SourceCode).HasColumnType("mediumtext");
-        builder.Property(s => s.RemoteSubmissionRef).HasMaxLength(100);
-        builder.Property(s => s.FailureReason).HasMaxLength(1000);
-        builder.Property(s => s.CancellationReason).HasMaxLength(500);
+        builder.Property(s => s.RemoteSubmissionRef).HasMaxLength(FieldLengths.RemoteSubmissionRef);
+        builder.Property(s => s.FailureReason).HasMaxLength(FieldLengths.FailureReason);
+        builder.Property(s => s.CancellationReason).HasMaxLength(FieldLengths.CancellationReason);
         builder.HasIndex(s => s.Status);
         builder.HasIndex(s => new { s.RegistrationId, s.ProblemId, s.ReceivedAt });
 

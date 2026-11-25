@@ -1,3 +1,4 @@
+using KYAUCPChapter.Core.Common;
 using KYAUCPChapter.Core.Domain.Contests;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -18,7 +19,7 @@ internal sealed class ContestConfiguration : IEntityTypeConfiguration<Contest>
 
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Id).ValueGeneratedNever();
-        builder.Property(c => c.Title).HasMaxLength(200);
+        builder.Property(c => c.Title).HasMaxLength(FieldLengths.ContestTitle);
         builder.Property(c => c.Description).HasColumnType("text");
 
         builder.ComplexProperty(c => c.Schedule, schedule =>

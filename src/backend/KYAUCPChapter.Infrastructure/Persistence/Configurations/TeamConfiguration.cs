@@ -1,3 +1,4 @@
+using KYAUCPChapter.Core.Common;
 using KYAUCPChapter.Core.Domain.Contests;
 using KYAUCPChapter.Core.Domain.Teams;
 using KYAUCPChapter.Infrastructure.Identity;
@@ -14,8 +15,8 @@ internal sealed class TeamConfiguration : IEntityTypeConfiguration<Team>
         builder.ToTable("Teams");
         builder.HasKey(t => t.Id);
         builder.Property(t => t.Id).ValueGeneratedNever();
-        builder.Property(t => t.Name).HasMaxLength(100);
-        builder.Property(t => t.NormalizedName).HasMaxLength(100).ForMySQLHasCollation(Collations.Binary);
+        builder.Property(t => t.Name).HasMaxLength(FieldLengths.TeamName);
+        builder.Property(t => t.NormalizedName).HasMaxLength(FieldLengths.TeamName).ForMySQLHasCollation(Collations.Binary);
         builder.Property(t => t.InviteCode).HasMaxLength(Team.InviteCodeLength).IsFixedLength().ForMySQLHasCollation(Collations.Binary);
         builder.HasIndex(t => new { t.ContestId, t.NormalizedName }).IsUnique();
         builder.HasIndex(t => t.InviteCode).IsUnique();

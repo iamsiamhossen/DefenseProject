@@ -1,3 +1,4 @@
+using KYAUCPChapter.Core.Common;
 using KYAUCPChapter.Core.Domain.Contests;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -12,11 +13,11 @@ internal sealed class ProblemConfiguration : IEntityTypeConfiguration<Problem>
         builder.ToTable("Problems");
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Id).ValueGeneratedNever();
-        builder.Property(p => p.Label).HasMaxLength(10).ForMySQLHasCollation(Collations.CaseInsensitiveAccentSensitive);
-        builder.Property(p => p.Title).HasMaxLength(200);
+        builder.Property(p => p.Label).HasMaxLength(FieldLengths.ProblemLabel).ForMySQLHasCollation(Collations.CaseInsensitiveAccentSensitive);
+        builder.Property(p => p.Title).HasMaxLength(FieldLengths.ProblemTitle);
         builder.Property(p => p.Statement).HasColumnType("longtext");
-        builder.Property(p => p.ExternalProblemId).HasMaxLength(100);
-        builder.Property(p => p.ExternalProblemUrl).HasMaxLength(500);
+        builder.Property(p => p.ExternalProblemId).HasMaxLength(FieldLengths.TophProblemId);
+        builder.Property(p => p.ExternalProblemUrl).HasMaxLength(FieldLengths.TophProblemUrl);
         builder.HasIndex(p => new { p.ContestId, p.Label }).IsUnique();
 
         builder.HasMany(p => p.TestCases)

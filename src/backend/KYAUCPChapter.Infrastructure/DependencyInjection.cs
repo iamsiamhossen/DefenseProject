@@ -1,3 +1,4 @@
+using KYAUCPChapter.Infrastructure.Identity;
 using KYAUCPChapter.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,7 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options => options.UseMySQL(connectionString));
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<ContestParticipationService>();
+        services.AddScoped<AccountService>();
         return services;
     }
 }
