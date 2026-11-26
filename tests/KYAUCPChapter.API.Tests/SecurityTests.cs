@@ -117,6 +117,17 @@ public sealed class SecurityTests(ApiFixture fixture) : ApiTest(fixture)
     }
 
     [Fact]
+    public async Task Server_request_errors_keep_their_status_code()
+    {
+        using var client = NewClient();
+
+        var response = await client.GetAsync("/api/test-probe/body-too-large");
+
+        Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
     public async Task Unexpected_errors_return_500_without_internal_details()
     {
         using var client = NewClient();

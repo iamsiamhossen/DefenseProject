@@ -1,0 +1,41 @@
+@import "tailwindcss";
+@import "@fontsource-variable/atkinson-hyperlegible-next";
+
+@theme {
+  --font-sans: "Atkinson Hyperlegible Next Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --color-ground: #eef2f1;
+  --color-surface: #ffffff;
+  --color-ink: #1d2733;
+  --color-muted: #5b6673;
+  --color-rule: #d3dad9;
+  --color-action: #0b6e69;
+  --color-action-strong: #08524e;
+  --color-danger: #b4332e;
+  --color-success: #1e7f4f;
+
+  --color-balloon-a: #c0392b;
+  --color-balloon-b: #1f6fb2;
+  --color-balloon-c: #2e7d32;
+  --color-balloon-d: #a85600;
+  --color-balloon-e: #7b3fa0;
+  --color-balloon-f: #ad1457;
+  --color-balloon-g: #5d4037;
+  --color-balloon-h: #3949ab;
+  --color-balloon-i: #6f6a10;
+  --color-balloon-j: #455a64;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-action);
+    outline-offset: 2px;
+  }
+}

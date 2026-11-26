@@ -1,6 +1,7 @@
 using KYAUCPChapter.API.Security;
 using KYAUCPChapter.Core.Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KYAUCPChapter.API.Tests;
@@ -25,6 +26,10 @@ public sealed class ProbeController : ControllerBase
     [HttpPost("domain-error")]
     [AllowAnonymous]
     public IActionResult DomainError() => throw new DomainException("Registration is not open for this contest.");
+
+    [HttpGet("body-too-large")]
+    [AllowAnonymous]
+    public IActionResult BodyTooLarge() => throw new BadHttpRequestException("Request body too large.", StatusCodes.Status413PayloadTooLarge);
 
     [HttpGet("unhandled-error")]
     [AllowAnonymous]

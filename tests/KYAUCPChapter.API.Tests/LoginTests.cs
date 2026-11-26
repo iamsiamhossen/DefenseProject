@@ -1,6 +1,8 @@
 using System.Net;
 using KYAUCPChapter.API.Security;
 using KYAUCPChapter.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace KYAUCPChapter.API.Tests;
 
@@ -70,6 +72,25 @@ public sealed class LoginTests(ApiFixture fixture) : ApiTest(fixture)
         var correctPassword = await LoginAsync(client, "student@kyau.test");
 
         Assert.Equal(HttpStatusCode.Unauthorized, correctPassword.StatusCode);
+    }
+
+    [Fact]
+    public async Task Existing_account_with_a_password_from_an_older_policy_can_still_sign_in()
+    {
+        const string email = "legacy@kyau.test";
+        const string legacyPassword = "Old1!";
+        await using (var scope = Fixture.Factory.Services.CreateAsyncScope())
+        {
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var user = new ApplicationUser { Id = Guid.CreateVersion7(), UserName = email, Email = email, FullName = "Legacy Student" };
+            user.PasswordHash = users.PasswordHasher.HashPassword(user, legacyPassword);
+            Assert.True((await users.CreateAsync(user)).Succeeded);
+            Assert.True((await users.AddToRoleAsync(user, Roles.Student)).Succeeded);
+        }
+
+        using var client = NewClient();
+
+        Assert.Equal(HttpStatusCode.OK, (await LoginAsync(client, email, legacyPassword)).StatusCode);
     }
 
     [Fact]

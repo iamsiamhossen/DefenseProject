@@ -47,7 +47,7 @@ public sealed class PersistenceMappingTests(DatabaseFixture fixture) : DatabaseT
             var tracked = await db.Contests.Include(c => c.Problems).ThenInclude(p => p.TestCases).SingleAsync(c => c.Id == contest.Id);
             tracked.UpdateDetails("Renamed Contest", "Updated", DuringRegistration);
             tracked.RemoveTestCase(problem.Id, 1, DuringRegistration);
-            tracked.AddTestCase(problem.Id, "5 5", "10", DuringRegistration);
+            tracked.AddTestCase(problem.Id, "5 5", "10", isSample: false, DuringRegistration);
             tracked.AddInternalProblem("B", "Product", "Print a * b.", 2000, 131072, [new("2 3", "6")], DuringRegistration);
             await db.SaveChangesAsync();
         }

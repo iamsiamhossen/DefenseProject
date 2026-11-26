@@ -2,10 +2,11 @@ namespace KYAUCPChapter.Core.Domain.Contests;
 
 public sealed class TestCase
 {
-    internal TestCase(Guid problemId, int position, string input, string expectedOutput)
+    internal TestCase(Guid problemId, int position, bool isSample, string input, string expectedOutput)
     {
         ProblemId = problemId;
         Position = position;
+        IsSample = isSample;
         Input = input;
         ExpectedOutput = expectedOutput;
     }
@@ -13,6 +14,8 @@ public sealed class TestCase
     public Guid ProblemId { get; private set; }
 
     public int Position { get; private set; }
+
+    public bool IsSample { get; private set; }
 
     public string Input { get; private set; }
 

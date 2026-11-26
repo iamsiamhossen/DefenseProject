@@ -73,6 +73,29 @@ public abstract class ApiTest(ApiFixture fixture) : IAsyncLifetime
         return client;
     }
 
+    protected static async Task<HttpResponseMessage> SendJsonAsync(HttpClient client, HttpMethod method, string url, object body) =>
+        await SendRawJsonAsync(client, method, url, JsonSerializer.Serialize(body));
+
+    protected static async Task<HttpResponseMessage> SendRawJsonAsync(HttpClient client, HttpMethod method, string url, string json)
+    {
+        var request = new HttpRequestMessage(method, url) { Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json") };
+        request.Headers.Add(SecurityServiceCollectionExtensions.AntiforgeryHeaderName, await GetAntiforgeryTokenAsync(client));
+        return await client.SendAsync(request);
+    }
+
+    protected static async Task<HttpResponseMessage> DeleteAsync(HttpClient client, string url)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Delete, url);
+        request.Headers.Add(SecurityServiceCollectionExtensions.AntiforgeryHeaderName, await GetAntiforgeryTokenAsync(client));
+        return await client.SendAsync(request);
+    }
+
+    protected static async Task<string?> DetailAsync(HttpResponseMessage response)
+    {
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        return (await ReadJsonAsync(response)).GetProperty("detail").GetString();
+    }
+
     protected static async Task<JsonElement> ReadJsonAsync(HttpResponseMessage response) =>
         JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
 

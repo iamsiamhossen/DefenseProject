@@ -1,4 +1,3 @@
-using System.Data;
 using KYAUCPChapter.Core.Common;
 using KYAUCPChapter.Core.Domain.Contests;
 using KYAUCPChapter.Core.Domain.Registrations;
@@ -61,9 +60,7 @@ public sealed class ContestParticipationService(AppDbContext db, TimeProvider ti
 
     private async Task<T> InLockedContestAsync<T>(Guid contestId, Func<Contest, DateTime, Task<T>> action, CancellationToken cancellationToken)
     {
-        await using var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
-
-        await db.Database.ExecuteSqlAsync($"SELECT `Id` FROM `Contests` WHERE `Id` = {contestId} FOR UPDATE", cancellationToken);
+        await using var transaction = await ContestRowLock.BeginAsync(db, contestId, cancellationToken);
         var contest = await db.Contests.SingleOrDefaultAsync(c => c.Id == contestId, cancellationToken)
             ?? throw new DomainException("Contest was not found.");
 

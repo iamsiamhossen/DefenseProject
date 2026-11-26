@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using KYAUCPChapter.API.Auth;
 using KYAUCPChapter.API.Errors;
 using KYAUCPChapter.API.Security;
@@ -10,7 +11,9 @@ builder.Services.AddInfrastructure(
     builder.Configuration.GetConnectionString("Default")
     ?? throw new InvalidOperationException("Connection string 'Default' is not configured."));
 builder.Services.AddApiSecurity(builder.Configuration);
-builder.Services.AddControllers(options => options.Filters.Add<ValidateAntiforgeryTokenFilter>());
+builder.Services
+    .AddControllers(options => options.Filters.Add<ValidateAntiforgeryTokenFilter>())
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<DomainExceptionHandler>();
 builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
@@ -22,7 +25,12 @@ if (args is [ProvisionOrganizerCommand.Name, ..])
     return await ProvisionOrganizerCommand.RunAsync(app.Services, args[1..], ProvisionOrganizerCommand.ReadConsoleSecret, Console.Out);
 }
 
-app.UseExceptionHandler();
+app.UseExceptionHandler(new ExceptionHandlerOptions
+{
+    StatusCodeSelector = exception => exception is BadHttpRequestException badRequest
+        ? badRequest.StatusCode
+        : StatusCodes.Status500InternalServerError
+});
 app.UseStatusCodePages();
 if (!app.Environment.IsDevelopment())
 {

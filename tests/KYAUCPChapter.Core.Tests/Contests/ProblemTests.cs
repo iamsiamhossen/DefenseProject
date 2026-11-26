@@ -25,6 +25,72 @@ public class ProblemTests
     }
 
     [Theory]
+    [InlineData(1000, 16384)]
+    [InlineData(15000, 524288)]
+    public void Internal_problem_limits_accept_the_approved_boundaries(int timeLimitMs, int memoryLimitKb)
+    {
+        var problem = DraftContest().AddInternalProblem("A", "Sum", "Print a + b.", timeLimitMs, memoryLimitKb, [], Now);
+
+        Assert.Equal((timeLimitMs, memoryLimitKb), (problem.TimeLimitMs, problem.MemoryLimitKb));
+    }
+
+    [Theory]
+    [InlineData(999, 262144)]
+    [InlineData(15001, 262144)]
+    [InlineData(1000, 16383)]
+    [InlineData(1000, 524289)]
+    [InlineData(0, 262144)]
+    public void Internal_problem_limits_must_be_within_the_approved_ranges(int timeLimitMs, int memoryLimitKb)
+    {
+        var contest = DraftContest();
+
+        Assert.Throws<DomainException>(() => contest.AddInternalProblem("A", "Sum", "Print a + b.", timeLimitMs, memoryLimitKb, OneTestCase, Now));
+    }
+
+    [Fact]
+    public void Sample_test_cases_do_not_count_as_hidden()
+    {
+        var contest = DraftContest();
+        var problem = contest.AddInternalProblem("A", "Sum", "Print a + b.", 1000, 262144, [new("1 2", "3", IsSample: true)], Now);
+
+        Assert.True(problem.TestCases.Single().IsSample);
+        Assert.False(problem.HasHiddenTestCase);
+        Assert.Throws<DomainException>(() => contest.Publish(Now));
+    }
+
+    [Fact]
+    public void Published_contest_rejects_a_new_internal_problem_with_only_samples()
+    {
+        var contest = PublishedContest();
+
+        Assert.Throws<DomainException>(() =>
+            contest.AddInternalProblem("B", "Product", "Print a * b.", 1000, 262144, [new("2 3", "6", IsSample: true)], DuringRegistration));
+    }
+
+    [Fact]
+    public void Published_contest_can_remove_samples_but_must_keep_a_hidden_test_case()
+    {
+        var contest = PublishedContest();
+        var problem = contest.Problems.Single();
+        var sample = contest.AddTestCase(problem.Id, "5 5", "10", isSample: true, DuringRegistration);
+
+        contest.RemoveTestCase(problem.Id, sample.Position, DuringRegistration);
+        Assert.Throws<DomainException>(() => contest.RemoveTestCase(problem.Id, 1, DuringRegistration));
+    }
+
+    [Fact]
+    public void Samples_and_hidden_cases_share_one_position_sequence()
+    {
+        var contest = DraftContest();
+        var problem = AddInternalProblem(contest, "A");
+
+        var hidden = contest.AddTestCase(problem.Id, "1 2", "3", isSample: false, Now);
+        var sample = contest.AddTestCase(problem.Id, "2 2", "4", isSample: true, Now);
+
+        Assert.Equal((1, false, 2, true), (hidden.Position, hidden.IsSample, sample.Position, sample.IsSample));
+    }
+
+    [Theory]
     [InlineData(0, 262144)]
     [InlineData(1000, 0)]
     public void Internal_problem_limits_must_be_positive(int timeLimitMs, int memoryLimitKb)
@@ -115,7 +181,7 @@ public class ProblemTests
         var contest = DraftContest();
         var toph = contest.AddTophProblem("B", "Add Them Up", "add-them-up", TophUrl, Now);
 
-        Assert.Throws<DomainException>(() => contest.AddTestCase(toph.Id, "1 2", "3", Now));
+        Assert.Throws<DomainException>(() => contest.AddTestCase(toph.Id, "1 2", "3", isSample: false, Now));
     }
 
     [Fact]
@@ -124,10 +190,10 @@ public class ProblemTests
         var contest = DraftContest();
         var problem = AddInternalProblem(contest, "A");
 
-        contest.AddTestCase(problem.Id, "1 2", "3", Now);
-        contest.AddTestCase(problem.Id, "2 2", "4", Now);
+        contest.AddTestCase(problem.Id, "1 2", "3", isSample: false, Now);
+        contest.AddTestCase(problem.Id, "2 2", "4", isSample: false, Now);
         contest.RemoveTestCase(problem.Id, 1, Now);
-        var third = contest.AddTestCase(problem.Id, "5 5", "10", Now);
+        var third = contest.AddTestCase(problem.Id, "5 5", "10", isSample: false, Now);
 
         Assert.Equal(3, third.Position);
         Assert.Equal([2, 3], problem.TestCases.Select(t => t.Position));
@@ -138,7 +204,7 @@ public class ProblemTests
     {
         var contest = DraftContest();
         var problem = AddInternalProblem(contest, "A");
-        contest.AddTestCase(problem.Id, "1 2", "3", Now);
+        contest.AddTestCase(problem.Id, "1 2", "3", isSample: false, Now);
 
         contest.UpdateTestCase(problem.Id, 1, "4 4", "8", Now);
 
@@ -151,7 +217,7 @@ public class ProblemTests
         var contest = PublishedContest();
         var problem = contest.Problems.Single();
 
-        Assert.Throws<DomainException>(() => contest.AddTestCase(problem.Id, "1 2", "3", StartsAt));
+        Assert.Throws<DomainException>(() => contest.AddTestCase(problem.Id, "1 2", "3", isSample: false, StartsAt));
     }
 
     [Fact]
@@ -212,7 +278,7 @@ public class ProblemTests
     {
         var contest = PublishedContest();
         var problem = contest.Problems.Single();
-        contest.AddTestCase(problem.Id, "2 2", "4", DuringRegistration);
+        contest.AddTestCase(problem.Id, "2 2", "4", isSample: false, DuringRegistration);
 
         contest.RemoveTestCase(problem.Id, 1, DuringRegistration);
 
@@ -234,7 +300,7 @@ public class ProblemTests
     {
         var contest = PublishedContest();
         var problem = contest.Problems.Single();
-        contest.AddTestCase(problem.Id, "2 2", "4", DuringRegistration);
+        contest.AddTestCase(problem.Id, "2 2", "4", isSample: false, DuringRegistration);
 
         Assert.Throws<DomainException>(() => contest.RemoveTestCase(problem.Id, 1, StartsAt));
     }

@@ -21,7 +21,9 @@ public static class SecurityServiceCollectionExtensions
                 options.SignIn.RequireConfirmedAccount = false;
                 options.SignIn.RequireConfirmedEmail = false;
                 options.Lockout.AllowedForNewUsers = true;
+                PasswordPolicy.Apply(options.Password);
             })
+            .AddPasswordValidator<MaximumPasswordLengthValidator>()
             .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<AppDbContext>()
             .AddSignInManager();

@@ -13,6 +13,10 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options => options.UseMySQL(connectionString));
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<ContestParticipationService>();
+        services.AddScoped<ContestManagementService>();
+        services.AddScoped<ContestQueries>();
+        services.AddScoped<ProblemManagementService>();
+        services.AddScoped<ProblemQueries>();
         services.AddScoped<AccountService>();
         return services;
     }

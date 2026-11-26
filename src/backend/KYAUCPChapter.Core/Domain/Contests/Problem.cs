@@ -4,6 +4,11 @@ namespace KYAUCPChapter.Core.Domain.Contests;
 
 public sealed class Problem
 {
+    public const int MinimumTimeLimitMs = 1_000;
+    public const int MaximumTimeLimitMs = 15_000;
+    public const int MinimumMemoryLimitKb = 16 * 1024;
+    public const int MaximumMemoryLimitKb = 512 * 1024;
+
     private readonly List<TestCase> _testCases = [];
 
     private Problem(Guid contestId, ProblemType type)
@@ -66,8 +71,18 @@ public sealed class Problem
         Label = label;
         Title = Guard.Required(title, "Problem title");
         Statement = Guard.Required(statement, "Problem statement");
-        TimeLimitMs = Guard.Positive(timeLimitMs, "Time limit");
-        MemoryLimitKb = Guard.Positive(memoryLimitKb, "Memory limit");
+        TimeLimitMs = InRange(timeLimitMs, MinimumTimeLimitMs, MaximumTimeLimitMs, "Time limit", "ms");
+        MemoryLimitKb = InRange(memoryLimitKb, MinimumMemoryLimitKb, MaximumMemoryLimitKb, "Memory limit", "KB");
+    }
+
+    private static int InRange(int value, int minimum, int maximum, string name, string unit)
+    {
+        if (value < minimum || value > maximum)
+        {
+            throw new DomainException($"{name} must be between {minimum:N0} and {maximum:N0} {unit}.");
+        }
+
+        return value;
     }
 
     internal void UpdateToph(string label, string title, string externalProblemId, string externalProblemUrl)
@@ -85,22 +100,30 @@ public sealed class Problem
         ExternalProblemUrl = url;
     }
 
-    internal TestCase AddTestCase(string input, string expectedOutput)
+    public bool HasHiddenTestCase => _testCases.Any(t => !t.IsSample);
+
+    internal TestCase AddTestCase(string input, string expectedOutput, bool isSample)
     {
         EnsureType(ProblemType.Internal);
+        ArgumentNullException.ThrowIfNull(input);
+        ArgumentNullException.ThrowIfNull(expectedOutput);
         var position = _testCases.Count == 0 ? 1 : _testCases.Max(t => t.Position) + 1;
-        var testCase = new TestCase(Id, position, input, expectedOutput);
+        var testCase = new TestCase(Id, position, isSample, input, expectedOutput);
         _testCases.Add(testCase);
         return testCase;
     }
 
-    internal void UpdateTestCase(int position, string input, string expectedOutput) =>
+    internal void UpdateTestCase(int position, string input, string expectedOutput)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        ArgumentNullException.ThrowIfNull(expectedOutput);
         GetTestCase(position).Update(input, expectedOutput);
+    }
 
-    internal void RemoveTestCase(int position, bool keepAtLeastOne)
+    internal void RemoveTestCase(int position, bool keepAHiddenTestCase)
     {
         var testCase = GetTestCase(position);
-        if (keepAtLeastOne && _testCases.Count == 1)
+        if (keepAHiddenTestCase && !testCase.IsSample && _testCases.Count(t => !t.IsSample) == 1)
         {
             throw new DomainException("An internal problem in a published contest must keep at least one hidden test case.");
         }

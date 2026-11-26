@@ -151,6 +151,9 @@ namespace KYAUCPChapter.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("IsSample")
+                        .HasColumnType("tinyint(1)");
+
                     b.HasKey("ProblemId", "Position");
 
                     b.ToTable("TestCases", (string)null);

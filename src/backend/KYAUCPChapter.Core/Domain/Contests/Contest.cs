@@ -108,7 +108,7 @@ public sealed class Contest
             throw new DomainException("A contest needs at least one problem before it can be published.");
         }
 
-        if (_problems.Any(p => p.Type == ProblemType.Internal && p.TestCases.Count == 0))
+        if (_problems.Any(p => p.Type == ProblemType.Internal && !p.HasHiddenTestCase))
         {
             throw new DomainException("Every internal problem needs at least one hidden test case before publication.");
         }
@@ -134,7 +134,7 @@ public sealed class Contest
         DateTime now)
     {
         EnsureEditable(now);
-        if (Status == ContestStatus.Published && testCases.Count == 0)
+        if (Status == ContestStatus.Published && testCases.All(t => t.IsSample))
         {
             throw new DomainException("An internal problem added to a published contest needs at least one hidden test case.");
         }
@@ -142,7 +142,7 @@ public sealed class Contest
         var problem = Problem.CreateInternal(Id, UniqueLabel(label, null), title, statement, timeLimitMs, memoryLimitKb);
         foreach (var testCase in testCases)
         {
-            problem.AddTestCase(testCase.Input, testCase.ExpectedOutput);
+            problem.AddTestCase(testCase.Input, testCase.ExpectedOutput, testCase.IsSample);
         }
 
         _problems.Add(problem);
@@ -181,10 +181,10 @@ public sealed class Contest
         _problems.Remove(problem);
     }
 
-    public TestCase AddTestCase(Guid problemId, string input, string expectedOutput, DateTime now)
+    public TestCase AddTestCase(Guid problemId, string input, string expectedOutput, bool isSample, DateTime now)
     {
         EnsureEditable(now);
-        return GetProblem(problemId).AddTestCase(input, expectedOutput);
+        return GetProblem(problemId).AddTestCase(input, expectedOutput, isSample);
     }
 
     public void UpdateTestCase(Guid problemId, int position, string input, string expectedOutput, DateTime now)
@@ -196,7 +196,7 @@ public sealed class Contest
     public void RemoveTestCase(Guid problemId, int position, DateTime now)
     {
         EnsureEditable(now);
-        GetProblem(problemId).RemoveTestCase(position, keepAtLeastOne: Status == ContestStatus.Published);
+        GetProblem(problemId).RemoveTestCase(position, keepAHiddenTestCase: Status == ContestStatus.Published);
     }
 
     public bool HasProblem(Guid problemId) => _problems.Any(p => p.Id == problemId);

@@ -59,13 +59,31 @@ public sealed class OrganizerProvisioningTests(ApiFixture fixture) : ApiTest(fix
         Assert.Contains("Usage:", output);
     }
 
-    [Fact]
-    public async Task Weak_password_is_rejected_by_the_identity_policy()
+    [Theory]
+    [InlineData(14)]
+    [InlineData(129)]
+    public async Task Password_length_outside_15_to_128_is_rejected(int length)
     {
-        var (exitCode, _) = await RunAsync(["--email", Email, "--name", "Club Organizer"], "weak", "weak");
+        var password = new string('p', length);
+
+        var (exitCode, output) = await RunAsync(["--email", Email, "--name", "Club Organizer"], password, password);
 
         Assert.Equal(1, exitCode);
+        Assert.Contains("Passwords must", output);
         Assert.False(await ExistsAsync(Email));
+    }
+
+    [Theory]
+    [InlineData(15)]
+    [InlineData(128)]
+    public async Task Password_within_the_limits_needs_no_character_classes(int length)
+    {
+        var password = new string('p', length);
+
+        var (exitCode, _) = await RunAsync(["--email", Email, "--name", "Club Organizer"], password, password);
+
+        Assert.Equal(0, exitCode);
+        Assert.True(await ExistsAsync(Email));
     }
 
     [Fact]

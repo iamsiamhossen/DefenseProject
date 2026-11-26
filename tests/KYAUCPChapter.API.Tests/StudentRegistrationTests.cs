@@ -126,14 +126,51 @@ public sealed class StudentRegistrationTests(ApiFixture fixture) : ApiTest(fixtu
         Assert.Equal(["Email"], await ErrorKeysAsync(response));
     }
 
-    [Fact]
-    public async Task Weak_password_is_rejected_by_the_identity_policy()
+    [Theory]
+    [InlineData(14)]
+    [InlineData(129)]
+    public async Task Password_length_outside_15_to_128_is_rejected(int length)
     {
         using var client = NewClient();
 
-        var response = await RegisterAsync(client, "student@kyau.test", "221-15-001", "weak");
+        var response = await RegisterAsync(client, "student@kyau.test", "221-15-001", new string('p', length));
 
         Assert.Equal(["Password"], await ErrorKeysAsync(response));
+    }
+
+    [Theory]
+    [InlineData("correct horse b")]
+    [InlineData("aaaaaaaaaaaaaaa")]
+    [InlineData("contest practice every friday at the lab")]
+    public async Task Password_needs_no_character_classes(string password)
+    {
+        using var client = NewClient();
+
+        var response = await RegisterAsync(client, "student@kyau.test", "221-15-001", password);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await LoginAsync(client, "student@kyau.test", password)).StatusCode);
+    }
+
+    [Fact]
+    public async Task Password_at_the_maximum_length_is_accepted()
+    {
+        using var client = NewClient();
+
+        var response = await RegisterAsync(client, "student@kyau.test", "221-15-001", new string('p', 128));
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Too_long_password_explains_the_limit()
+    {
+        using var client = NewClient();
+
+        var response = await RegisterAsync(client, "student@kyau.test", "221-15-001", new string('p', 129));
+
+        var messages = (await ReadJsonAsync(response)).GetProperty("errors").GetProperty("Password").EnumerateArray().Select(m => m.GetString());
+        Assert.Equal(["Passwords must be at most 128 characters."], messages);
     }
 
     [Fact]
